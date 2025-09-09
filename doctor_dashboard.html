@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Doctor Dashboard - Healthcare System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2 class="mb-4"><i class="fas fa-stethoscope me-2"></i>Doctor Dashboard</h2>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>My Appointments</h5>
+            </div>
+            <div class="card-body">
+                {% if appointments %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Patient</th>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Reason</th>
+                                    <th>Status</th>
+                                    <th>Booked On</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for appointment in appointments %}
+                                <tr>
+                                    <td>{{ appointment.id }}</td>
+                                    <td>
+                                        <i class="fas fa-user me-1"></i>{{ appointment.patient_name }}
+                                    </td>
+                                    <td>{{ appointment.appointment_date }}</td>
+                                    <td>{{ appointment.appointment_time }}</td>
+                                    <td>{{ appointment.reason }}</td>
+                                    <td>
+                                        {% if appointment.status == 'pending' %}
+                                            <span class="badge bg-warning">
+                                                <i class="fas fa-clock me-1"></i>Pending
+                                            </span>
+                                        {% elif appointment.status == 'approved' %}
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check me-1"></i>Approved
+                                            </span>
+                                        {% elif appointment.status == 'rejected' %}
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-times me-1"></i>Rejected
+                                            </span>
+                                        {% elif appointment.status == 'completed' %}
+                                            <span class="badge bg-info">
+                                                <i class="fas fa-check-double me-1"></i>Completed
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ appointment.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    <td>
+                                        {% if appointment.status == 'pending' %}
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <form method="POST" action="{{ url_for('update_appointment_status') }}" class="d-inline">
+                                                    <input type="hidden" name="appointment_id" value="{{ appointment.id }}">
+                                                    <input type="hidden" name="status" value="approved">
+                                                    <button type="submit" class="btn btn-success btn-sm">
+                                                        <i class="fas fa-check"></i>
+                                                    </button>
+                                                </form>
+                                                <form method="POST" action="{{ url_for('update_appointment_status') }}" class="d-inline">
+                                                    <input type="hidden" name="appointment_id" value="{{ appointment.id }}">
+                                                    <input type="hidden" name="status" value="rejected">
+                                                    <button type="submit" class="btn btn-danger btn-sm">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        {% elif appointment.status == 'approved' %}
+                                            <form method="POST" action="{{ url_for('update_appointment_status') }}" class="d-inline">
+                                                <input type="hidden" name="appointment_id" value="{{ appointment.id }}">
+                                                <input type="hidden" name="status" value="completed">
+                                                <button type="submit" class="btn btn-info btn-sm">
+                                                    <i class="fas fa-check-double me-1"></i>Complete
+                                                </button>
+                                            </form>
+                                        {% else %}
+                                            <span class="text-muted">No actions</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                        <h5>No Appointments Found</h5>
+                        <p class="text-muted">You don't have any appointments scheduled.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
